@@ -1,1 +1,1 @@
-# RAG-Chatbot
+# Project description and setup instructions
