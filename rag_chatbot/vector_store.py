@@ -16,6 +16,7 @@ class VectorStore:
 
     def build_index(self, chunks):
         #Build a FAISS index from text chunks.
+        print("build index")
         self.text_chunks = chunks
         embeddings = self.embed_text(chunks)
         dimension = embeddings.shape[1]

@@ -3,7 +3,7 @@ import requests
 import os
 
 class TogetherLLM:
-    def __init__(self, api_key=None, model="mistralai/Mixtral-8x7B-Instruct-v0.1"):
+    def __init__(self, api_key=None, model="meta-llama/Llama-3.3-70B-Instruct-Turbo-Free"):
         self.api_key = api_key or os.getenv("TOGETHER_API_KEY")
         self.api_url = "https://api.together.xyz/v1/completions"
         self.model = model

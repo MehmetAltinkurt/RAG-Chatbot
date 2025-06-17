@@ -25,9 +25,8 @@ def extract_text_from_docx(file_path):
         print(f"Error reading DOCX file: {e}")
     return text
 
-def get_text_from_file(file_path):
+def get_text_from_file(file_path, ext):
     #Determines the file type and extracts text accordingly.
-    _, ext = os.path.splitext(file_path)
     if ext.lower() == ".pdf":
         return extract_text_from_pdf(file_path)
     elif ext.lower() in [".docx", ".doc"]:
