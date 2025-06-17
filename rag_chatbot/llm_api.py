@@ -29,4 +29,4 @@ class TogetherLLM:
             return response.json()["choices"][0]["text"].strip()
         else:
             print("Error:", response.status_code, response.text)
-            return "Sorry, I couldn't process your request."
+            return "Sorry, I couldn't process your request.\n" + response.text

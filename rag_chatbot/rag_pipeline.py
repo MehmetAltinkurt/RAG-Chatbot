@@ -8,10 +8,8 @@ class RAGPipeline:
                  api_key=None):
         self.retriever = Retriever(model_name=embedding_model)
         self.llm = TogetherLLM(api_key=api_key, model=llm_model)
-        print("RAGPipeline initialized")
 
     def build_knowledge_base(self, text_chunks):
-        print("text_chunks")
         #Index the given text chunks in the vector database.
         self.retriever.index_documents(text_chunks)
 

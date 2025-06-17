@@ -2,6 +2,7 @@
 import streamlit as st
 from rag_chatbot.file_handler import get_text_from_file
 from rag_chatbot.rag_pipeline import RAGPipeline
+from rag_chatbot.text_splitter import chunk_with_langchain
 
 import os
 import tempfile
@@ -14,7 +15,7 @@ TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 # Initialize RAGPipeline only once using Streamlit session state
 if "rag" not in st.session_state:
     st.session_state.rag = RAGPipeline(api_key=TOGETHER_API_KEY)
-#print(st.session_state.rag.retriever.vector_store.text_chunks)
+
 st.title("📄🧠 RAG QA Chatbot")
 st.markdown("Upload documents (PDF or DOCX) and ask questions about their content.")
 
@@ -34,8 +35,7 @@ if uploaded_files:
 
         try:
             text = get_text_from_file(tmp_file_path, ext)
-            chunks = text.split("\\n\\n")  # Naive chunking; can be replaced with a better splitter
-            #todo: better chunking with langchain
+            chunks = chunk_with_langchain(text)
             all_text_chunks.extend(chunks)
             st.success(f"Processed: {uploaded_file.name}")
         except Exception as e:
