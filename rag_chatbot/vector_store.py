@@ -1,5 +1,6 @@
 # FAISS or other vector DB integration
 import os
+import json
 import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -15,12 +16,21 @@ class VectorStore:
         return self.model.encode(texts, show_progress_bar=True)
 
     def build_index(self, chunks):
-        #Build a FAISS index from text chunks.
-        self.text_chunks = chunks
-        embeddings = self.embed_text(chunks)
-        dimension = embeddings.shape[1]
-        self.index = faiss.IndexFlatL2(dimension)
-        self.index.add(np.array(embeddings).astype("float32"))
+        #Build or update FAISS index by adding only new chunks.
+        # Only process new chunks
+        new_chunks = chunks[len(self.text_chunks):]
+        if not new_chunks:
+            return  # nothing new to add
+
+        new_embeddings = self.embed_text(new_chunks)
+
+        if self.index is None:
+            # First-time setup
+            dim = new_embeddings.shape[1]
+            self.index = faiss.IndexFlatL2(dim)
+
+        self.index.add(np.array(new_embeddings).astype("float32"))
+        self.text_chunks.extend(new_chunks)
 
     def search(self, query, top_k=5):
         #Retrieve top_k relevant chunks for a query.
@@ -42,3 +52,13 @@ class VectorStore:
             self.text_chunks = chunks
         else:
             raise FileNotFoundError(f"No FAISS index found at {path}")
+    
+    def save_text_chunks(self, path="data/text_chunks.json"):
+        #Save the associated text chunks to a JSON file.
+        with open(path, "w", encoding="utf-8") as f:
+            json.dump(self.text_chunks, f)
+
+    def load_text_chunks(self, path="data/text_chunks.json"):
+        #Load text chunks from a JSON file.
+        with open(path, "r", encoding="utf-8") as f:
+            self.text_chunks = json.load(f)

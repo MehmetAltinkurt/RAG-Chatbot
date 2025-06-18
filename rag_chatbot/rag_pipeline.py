@@ -20,8 +20,12 @@ class RAGPipeline:
         prompt = f"Use the following context to answer the question.\\n\\nContext:\\n{context}\\n\\nQuestion: {question}\\nAnswer:"
         return self.llm.generate(prompt)
 
-    def save_index(self, path="data/faiss.index"):
-        self.retriever.save(path)
+    def save_state(self, index_path="data/faiss.index", chunks_path="data/text_chunks.json"):
+        #Save FAISS index and text chunks.
+        self.retriever.save(index_path)
+        self.retriever.vector_store.save_text_chunks(chunks_path)
 
-    def load_index(self, chunks, path="data/faiss.index"):
-        self.retriever.load(chunks, path)
+    def load_state(self, index_path="data/faiss.index", chunks_path="data/text_chunks.json"):
+        #Load FAISS index and text chunks.
+        self.retriever.vector_store.load_text_chunks(chunks_path)
+        self.retriever.load(self.retriever.vector_store.text_chunks, index_path)
