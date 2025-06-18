@@ -13,11 +13,18 @@ class RAGPipeline:
         #Index the given text chunks in the vector database.
         self.retriever.index_documents(text_chunks)
 
-    def answer_question(self, question, top_k=5):
+    def answer_question(self, question, top_k=10):
         #Use RAG to answer a question: retrieve + generate.
         retrieved_chunks = self.retriever.retrieve(question, top_k=top_k)
         context = "\\n".join(retrieved_chunks)
-        prompt = f"Use the following context to answer the question.\\n\\nContext:\\n{context}\\n\\nQuestion: {question}\\nAnswer:"
+        prompt = (
+            f"You are a helpful assistant. Use only the context below to answer the question clearly and concisely. "
+            f"Do not include extra phrases like 'Let me know if I should continue'. "
+            f"Respond in a single paragraph without repeating the question.\n\n"
+            f"Context:\n{context}\n\n"
+            f"Question: {question}\n\n"
+            f"Answer:"
+        )
         return self.llm.generate(prompt)
 
     def save_state(self, index_path="data/faiss.index", chunks_path="data/text_chunks.json"):
