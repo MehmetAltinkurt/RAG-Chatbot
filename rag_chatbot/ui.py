@@ -22,6 +22,9 @@ if "processed_files" not in st.session_state:
 if "chunks" not in st.session_state:
     st.session_state.chunks = []
 
+if "qa_cache" not in st.session_state:
+    st.session_state.qa_cache = {}
+
 st.title("📄🧠 RAG QA Chatbot")
 st.markdown("Upload documents (PDF or DOCX) and ask questions about their content.")
 
@@ -58,5 +61,9 @@ user_question = st.text_input("Your question:")
 
 if user_question and "chunks" in st.session_state and st.session_state.chunks:
     with st.spinner("Retrieving answer..."):
-        answer = st.session_state.rag.answer_question(user_question)
+        if user_question in st.session_state.qa_cache:
+            answer = st.session_state.qa_cache[user_question]
+        else:
+            answer = st.session_state.rag.answer_question(user_question)
+            st.session_state.qa_cache[user_question] = answer
         st.markdown(f"**Answer:** {answer}")
