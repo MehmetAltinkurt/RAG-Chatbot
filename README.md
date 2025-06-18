@@ -38,16 +38,10 @@ streamlit run rag_chatbot/ui.py
 
 ---
 
-## 🐳 Running with Docker
+## 🐳 Run from DockerHub
 
-### Build the image
 ```bash
-docker build -t rag-chatbot .
-```
-
-### Run the container
-```bash
-docker run -p 8501:8501 --env-file .env
+docker run -p 8501:8501 mehmetaltinkurt/rag-chatbot:v1
 ```
 ---
 
