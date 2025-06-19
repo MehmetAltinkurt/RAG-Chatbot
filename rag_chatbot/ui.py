@@ -21,7 +21,7 @@ use_local_llm = llm_mode == "Offline (Local LLM)"
 
 # Initialize RAGPipeline only once using Streamlit session state
 if "rag" not in st.session_state:
-    st.session_state.rag = RAGPipeline(api_key=TOGETHER_API_KEY, use_local_llm=use_local_llm)
+    st.session_state.rag = RAGPipeline(api_key=TOGETHER_API_KEY)
 
 if "processed_files" not in st.session_state:
     st.session_state.processed_files = set()
@@ -71,6 +71,6 @@ if user_question and "chunks" in st.session_state and st.session_state.chunks:
         if user_question in st.session_state.qa_cache:
             answer = st.session_state.qa_cache[user_question]
         else:
-            answer = st.session_state.rag.answer_question(user_question)
+            answer = st.session_state.rag.answer_question(user_question, use_local_llm=use_local_llm )
             st.session_state.qa_cache[user_question] = answer
         st.markdown(f"**Answer:** {answer}")

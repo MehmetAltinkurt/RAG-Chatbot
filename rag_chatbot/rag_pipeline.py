@@ -6,19 +6,16 @@ from rag_chatbot.local_llm import LocalLLM
 class RAGPipeline:
     def __init__(self, embedding_model='sentence-transformers/all-MiniLM-L6-v2',
                  llm_model='meta-llama/Llama-3.3-70B-Instruct-Turbo-Free', #'mistralai/Mixtral-8x7B-Instruct-v0.1',
-                 api_key=None,
-                 use_local_llm=False):
+                 api_key=None):
         self.retriever = Retriever(model_name=embedding_model)
-        if use_local_llm:
-            self.llm = LocalLLM(model_name="mistralai/Mistral-7B-Instruct-v0.1")
-        else:
-            self.llm = TogetherLLM(api_key=api_key, model='meta-llama/Llama-3.3-70B-Instruct-Turbo-Free')
+        self.local_llm = LocalLLM(model_name="mistralai/Mistral-7B-Instruct-v0.1")#"crumb/nano-mistral"
+        self.together_llm = TogetherLLM(api_key=api_key, model='meta-llama/Llama-3.3-70B-Instruct-Turbo-Free')
 
     def build_knowledge_base(self, text_chunks):
         #Index the given text chunks in the vector database.
         self.retriever.index_documents(text_chunks)
 
-    def answer_question(self, question, top_k=10):
+    def answer_question(self, question, use_local_llm=False, top_k=10):
         #Use RAG to answer a question: retrieve + generate.
         retrieved_chunks = self.retriever.retrieve(question, top_k=top_k)
         context = "\\n".join(retrieved_chunks)
@@ -30,7 +27,10 @@ class RAGPipeline:
             f"Question: {question}\n\n"
             f"Answer:"
         )
-        return self.llm.generate(prompt)
+        if use_local_llm:
+            return self.local_llm.generate(prompt)
+        else:
+            return self.llm.generate(prompt)
 
     def save_state(self, index_path="data/faiss.index", chunks_path="data/text_chunks.json"):
         #Save FAISS index and text chunks.
