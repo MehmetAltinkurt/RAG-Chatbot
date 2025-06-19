@@ -12,9 +12,13 @@ load_dotenv()
 # Load API key from environment variable or manually set here
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 
+# Choose LLM mode
+llm_mode = st.sidebar.radio("LLM Mode", ["Online (Together.ai)", "Offline (Local LLM)"])
+use_local_llm = llm_mode == "Offline (Local LLM)"
+
 # Initialize RAGPipeline only once using Streamlit session state
 if "rag" not in st.session_state:
-    st.session_state.rag = RAGPipeline(api_key=TOGETHER_API_KEY)
+    st.session_state.rag = RAGPipeline(api_key=TOGETHER_API_KEY, use_local_llm=use_local_llm)
 
 if "processed_files" not in st.session_state:
     st.session_state.processed_files = set()

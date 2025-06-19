@@ -11,7 +11,7 @@ A Retrieval-Augmented Generation (RAG) chatbot that allows users to upload docum
 - ✅ Text chunking using LangChain's `RecursiveCharacterTextSplitter`
 - ✅ Embedding with `sentence-transformers`
 - ✅ Vector storage using FAISS with incremental updates
-- ✅ Question-answering with Together.ai API (e.g., Mistral-7B-Instruct)
+- ✅ Question-answering with Together.ai API (e.g., meta-llama/Llama-3.3-70B-Instruct-Turbo-Free)
 - ✅ Caching of previous questions to speed up repeated queries
 - ✅ Persistent FAISS index and chunk storage between sessions
 - ✅ Clean and simple Streamlit UI

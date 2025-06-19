@@ -1,13 +1,18 @@
 # Tie together retrieval and generation
 from rag_chatbot.retriever import Retriever
 from rag_chatbot.llm_api import TogetherLLM
+from rag_chatbot.local_llm import LocalLLM
 
 class RAGPipeline:
     def __init__(self, embedding_model='sentence-transformers/all-MiniLM-L6-v2',
                  llm_model='meta-llama/Llama-3.3-70B-Instruct-Turbo-Free', #'mistralai/Mixtral-8x7B-Instruct-v0.1',
-                 api_key=None):
+                 api_key=None,
+                 use_local_llm=False):
         self.retriever = Retriever(model_name=embedding_model)
-        self.llm = TogetherLLM(api_key=api_key, model=llm_model)
+        if use_local_llm:
+            self.llm = LocalLLM(model_name="mistralai/Mistral-7B-Instruct-v0.1")
+        else:
+            self.llm = TogetherLLM(api_key=api_key, model='meta-llama/Llama-3.3-70B-Instruct-Turbo-Free')
 
     def build_knowledge_base(self, text_chunks):
         #Index the given text chunks in the vector database.
