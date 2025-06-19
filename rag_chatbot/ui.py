@@ -1,16 +1,16 @@
-# Streamlit UI goes here
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 import streamlit as st
 from rag_chatbot.file_handler import get_text_from_file
 from rag_chatbot.rag_pipeline import RAGPipeline
 from rag_chatbot.text_splitter import chunk_with_langchain
 
-import os
 import tempfile
 from dotenv import load_dotenv
 load_dotenv()
 
-import sys, os
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 
 # Load API key from environment variable or manually set here
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
