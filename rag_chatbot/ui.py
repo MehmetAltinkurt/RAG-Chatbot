@@ -9,6 +9,9 @@ import tempfile
 from dotenv import load_dotenv
 load_dotenv()
 
+import sys, os
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
 # Load API key from environment variable or manually set here
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 
