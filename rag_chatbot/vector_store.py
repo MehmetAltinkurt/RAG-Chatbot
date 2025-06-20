@@ -32,7 +32,7 @@ class VectorStore:
         self.index.add(np.array(new_embeddings).astype("float32"))
         self.text_chunks.extend(new_chunks)
 
-    def search(self, query, top_k=5):
+    def search(self, query, top_k):
         #Retrieve top_k relevant chunks for a query.
         if not self.index:
             raise ValueError("FAISS index not built.")

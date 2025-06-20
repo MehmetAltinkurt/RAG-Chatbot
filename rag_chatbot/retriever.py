@@ -9,7 +9,7 @@ class Retriever:
         #Index the provided text chunks.
         self.vector_store.build_index(text_chunks)
 
-    def retrieve(self, query, top_k=10):
+    def retrieve(self, query, top_k):
         #Retrieve top_k relevant text chunks for the query.
         return self.vector_store.search(query, top_k)
 
