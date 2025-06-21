@@ -23,6 +23,8 @@ local_model = st.sidebar.text_input("Local LLM Model", "crumb/nano-mistral")
 # Initialize retriever once
 if "retriever_manager" not in st.session_state:
     st.session_state.retriever_manager = RetrieverManager()
+if "file_uploader_key" not in st.session_state:
+    st.session_state["file_uploader_key"] = 0
 
 # Initialize session state
 st.session_state.setdefault("chunks", [])
@@ -52,7 +54,13 @@ top_k = st.sidebar.slider("Top-K Chunks", min_value=1, max_value=20, value=5, st
 st.title("📄🧠 RAG QA Chatbot")
 st.markdown("Upload documents (PDF or DOCX) and ask questions about their content.")
 
-uploaded_files = st.file_uploader("Upload files", type=["pdf", "docx"], accept_multiple_files=True)
+if st.sidebar.button("🔄 Reset App"):
+    for key in list(st.session_state.keys()):
+        if key != "file_uploader_key":
+            del st.session_state[key]
+    st.session_state["file_uploader_key"] += 1
+    st.session_state["question_input"] = ""
+uploaded_files = st.file_uploader("Upload files", type=["pdf", "docx"], accept_multiple_files=True, key=st.session_state["file_uploader_key"])
 
 if uploaded_files:
     new_chunks = []
@@ -80,8 +88,7 @@ if uploaded_files:
 
 # Q&A
 st.subheader("Ask a question")
-user_question = st.text_input("Your question:")
-
+user_question = st.text_input("Your question:", key="question_input")
 if user_question and st.session_state.chunks:
     with st.spinner("Retrieving answer..."):
         retrieved_chunks = st.session_state.retriever_manager.retrieve_context(user_question, top_k)
