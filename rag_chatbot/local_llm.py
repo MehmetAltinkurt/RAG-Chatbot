@@ -20,7 +20,10 @@ class LocalLLM:
             tokenizer=self.tokenizer,
             max_new_tokens=max_tokens,
             return_full_text=False,
-            do_sample=False
+            do_sample=False,
+            temperature=None,
+            top_p=None,
+            top_k=None
         )
 
     def generate(self, prompt, max_tokens=None):

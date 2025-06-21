@@ -121,4 +121,4 @@ if user_question and st.session_state.chunks:
             for doc, chunks in doc_chunks.items():
                 st.markdown(f"**📁 {doc}**")
                 for chunk in chunks:
-                    st.code(chunk)
+                    st.code(chunk.lstrip(".•*- \n"))
