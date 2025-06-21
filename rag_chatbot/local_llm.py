@@ -2,8 +2,11 @@ import os
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 from dotenv import load_dotenv
 load_dotenv()
-from huggingface_hub import login
-login(os.getenv("HUGGINGFACE_HUB_TOKEN"))
+
+from huggingface_hub import HfFolder
+hf_token = os.getenv("HUGGINGFACE_HUB_TOKEN")
+if hf_token:
+    HfFolder.save_token(hf_token)
 
 class LocalLLM:
     def __init__(self, model_name="mistralai/Mistral-7B-Instruct-v0.1", max_tokens=256):
