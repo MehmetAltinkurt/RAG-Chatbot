@@ -1,7 +1,7 @@
 
 # 🧠 RAG QA Chatbot Application
 
-A Retrieval-Augmented Generation (RAG) chatbot that allows users to upload documents (PDF or DOCX), ask questions in natural language, and receive accurate answers based on the content of the uploaded documents — all powered by a vector database and LLMs.
+A Retrieval-Augmented Generation (RAG) chatbot that allows users to upload documents (PDF or DOCX), ask questions in natural language, and receive accurate answers based on the content of the uploaded documents — all powered by a vector database and local or API-based LLMs.
 
 ---
 
@@ -10,58 +10,117 @@ A Retrieval-Augmented Generation (RAG) chatbot that allows users to upload docum
 - ✅ Upload multiple documents (PDF, DOCX)
 - ✅ Text chunking using LangChain's `RecursiveCharacterTextSplitter`
 - ✅ Embedding with `sentence-transformers`
-- ✅ Vector storage using FAISS with incremental updates
-- ✅ Question-answering with Together.ai API (e.g., meta-llama/Llama-3.3-70B-Instruct-Turbo-Free)
-- ✅ Caching of previous questions to speed up repeated queries
-- ✅ Persistent FAISS index and chunk storage between sessions
-- ✅ Clean and simple Streamlit UI
+- ✅ Vector storage using FAISS with persistent caching
+- ✅ Question-answering using:
+  - 🔌 Together.ai API
+  - 💻 Local HuggingFace LLMs (with CPU/GPU support)
+- ✅ Select LLM and model at runtime via sidebar
+- ✅ Adjustable top-k chunk retrieval slider
+- ✅ Cached answers for faster repeated queries
+- ✅ Reset App button to clear everything
+- ✅ Chunk-source tracking and grouped display by document
+- ✅ Works offline or online
 - ✅ Fully containerized with Docker
 
 ---
 
-## 📦 Installation (Local Dev)
+## 🧑‍💻 How to Run
+
+### 🔹 1. Clone the repository (optional for local dev)
 
 ```bash
-# Clone the repository
 git clone https://github.com/MehmetAltinkurt/rag-chatbot.git
 cd rag-chatbot
+```
 
-# Set up Python environment
+---
+
+### 🔹 2. Run with Docker (recommended)
+
+You can pull and run the prebuilt image directly from Docker Hub:
+
+```bash
+docker pull mehmetaltinkurt/rag-chatbot:v2
+docker run -p 8501:8501 --env-file .env mehmetaltinkurt/rag-chatbot:v2
+```
+
+To enable GPU support (if using `nvidia-docker`):
+
+```bash
+docker run --gpus all -p 8501:8501 --env-file .env mehmetaltinkurt/rag-chatbot:v2
+```
+
+---
+
+## 🧪 Local Development
+
+### 🔹 Install dependencies
+
+```bash
 pip install -r requirements.txt
+```
 
-# Create a .env file
-echo "TOGETHER_API_KEY=your_api_key_here" > .env
+Or with CUDA:
 
-# Run the app
+```bash
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+```
+
+---
+
+### 🔹 Set up `.env`
+
+Create a `.env` file in your project root:
+
+```env
+TOGETHER_API_KEY=your_together_api_key
+HUGGINGFACE_HUB_TOKEN=your_huggingface_token
+```
+
+---
+
+### 🔹 Run the app locally
+
+```bash
 streamlit run rag_chatbot/ui.py
 ```
 
 ---
 
-## 🐳 Run from DockerHub
+## 🤖 Run in Google Colab
 
-```bash
-docker run -p 8501:8501 mehmetaltinkurt/rag-chatbot:v1
+1. Mount secrets securely:
+
+```python
+from google.colab import userdata
+import os
+
+os.environ["TOGETHER_API_KEY"] = userdata.get("TOGETHER_API_KEY")
+os.environ["HUGGINGFACE_HUB_TOKEN"] = userdata.get("HUGGINGFACE_HUB_TOKEN")
 ```
+
+2. Launch the app:
+
+```python
+!git clone https://github.com/MehmetAltinkurt/rag-chatbot.git
+%cd rag-chatbot
+!pip install -r requirements.txt
+!streamlit run rag_chatbot/ui.py &
+from pyngrok import ngrok
+print(ngrok.connect(8501))
+```
+
 ---
 
-## 🔑 Environment Variables
+## 🧪 Usage Tips
 
-| Variable          | Description                  |
-|------------------|------------------------------|
-| `TOGETHER_API_KEY` | Your Together.ai API key     |
-
----
-
-## 🧪 How It Works
-
-1. Upload documents (PDF or DOCX)
-2. Each document is parsed and split into overlapping chunks
-3. Chunks are embedded and added to the FAISS index
-4. When a question is asked:
-   - Top-10 relevant chunks are retrieved
-   - A prompt is built and sent to the LLM (Together.ai)
-   - The answer is generated and returned
+- Use the sidebar to:
+  - Choose LLM mode (Together.ai or Local)
+  - Set the model name
+  - Adjust Top-K chunks retrieved
+- Uploaded files and answers are cached
+- 💬 Answer and 📄 Source Chunks are shown side-by-side
+- Click **Reset App** to clear files, chunks, and history
 
 ---
 
@@ -69,36 +128,27 @@ docker run -p 8501:8501 mehmetaltinkurt/rag-chatbot:v1
 
 ```
 rag_chatbot/
-├── ui.py                  # Streamlit UI
-├── file_handler.py        # PDF/DOCX reading
-├── text_splitter.py       # LangChain chunking
-├── vector_store.py        # FAISS with persistent chunks
-├── retriever.py           # Retrieval logic
-├── llm_api.py             # Together.ai interaction
-├── rag_pipeline.py        # Orchestrates RAG pipeline
-data/                      # Stored FAISS index + chunks
-Dockerfile
-requirements.txt
-.env
+├── ui.py                  # Streamlit UI logic
+├── file_handler.py        # PDF/DOCX parsing
+├── text_splitter.py       # Chunking logic
+├── vector_store.py        # FAISS logic
+├── retriever.py           # Retriever wrapper
+├── retriever_manager.py   # Session-safe retriever state
+├── llm_api.py             # Together.ai completion
+├── local_llm.py           # Transformers-based local LLM
+├── llm_manager.py         # LLM mode switcher
+data/                      # Stores chunks and FAISS index
 ```
 
 ---
 
-## ✅ Evaluation Highlights
+## 📦 Docker Image
 
-- 🔍 **Relevant Document Retrieval**: LangChain splitter + FAISS for fast retrieval
-- 🧠 **LLM Output**: Controlled prompt format + stop sequences
-- 🧪 **Tested**: Dockerized and tested with 100+ page documents
-
----
-
-## 📬 Submission Info
-
-This project was developed as part of a technical interview task. For more information, see the original task.
+- 🐳 DockerHub: [`mehmetaltinkurt/rag-chatbot:v2`](https://hub.docker.com/r/mehmetaltinkurt/rag-chatbot)
+- Includes full environment and runs offline or with Together.ai
 
 ---
 
-## 📜 License
+## 🧾 License
 
 MIT License
-
