@@ -18,7 +18,7 @@ TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 llm_mode = st.sidebar.radio("LLM Mode", ["Online (Together.ai)", "Offline (Local LLM)"])
 use_local_llm = llm_mode == "Offline (Local LLM)"
 together_model = st.sidebar.text_input("Together.ai Model", "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free")
-local_model = st.sidebar.text_input("Local LLM Model", "crumb/nano-mistral")
+local_model = st.sidebar.text_input("Local LLM Model", "Qwen/Qwen2.5-0.5B-Instruct")
 
 # Initialize retriever once
 if "retriever_manager" not in st.session_state:
@@ -101,12 +101,13 @@ if user_question and st.session_state.chunks:
         else:
             context = "\n\n".join(retrieved_chunks)
             prompt = (
+            f"###Instruction:\\n"
             f"You are a helpful assistant. Use only the context below to answer the question clearly and concisely. "
             f"Do not include extra phrases like 'Let me know if I should continue'. "
             f"Respond in a single paragraph without repeating the question.\\n\\n"
-            f"Context:\\n{context}\\n\\n"
-            f"Question: {user_question}\\n\\n"
-            f"Answer:"
+            f"###Context:\\n{context}\\n\\n"
+            f"###Question: {user_question}\\n\\n"
+            f"###Answer:"
         )
             answer = st.session_state.llm_manager.answer(prompt)
             st.session_state.qa_cache[user_question] = answer

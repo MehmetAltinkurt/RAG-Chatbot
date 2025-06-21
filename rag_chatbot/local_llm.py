@@ -19,6 +19,7 @@ class LocalLLM:
             model=self.model,
             tokenizer=self.tokenizer,
             max_new_tokens=max_tokens,
+            return_full_text=False,
             do_sample=False
         )
 
