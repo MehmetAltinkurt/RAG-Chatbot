@@ -14,6 +14,13 @@ load_dotenv()
 # Load API key
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 
+if st.sidebar.button("🔄 Reset App"):
+    for key in list(st.session_state.keys()):
+        if key != "file_uploader_key":
+            del st.session_state[key]
+    st.session_state["file_uploader_key"] += 1
+    st.session_state["question_input"] = ""
+
 # Sidebar model selection
 llm_mode = st.sidebar.radio("LLM Mode", ["Online (Together.ai)", "Offline (Local LLM)"])
 use_local_llm = llm_mode == "Offline (Local LLM)"
@@ -54,12 +61,6 @@ top_k = st.sidebar.slider("Top-K Chunks", min_value=1, max_value=20, value=5, st
 st.title("📄🧠 RAG QA Chatbot")
 st.markdown("Upload documents (PDF or DOCX) and ask questions about their content.")
 
-if st.sidebar.button("🔄 Reset App"):
-    for key in list(st.session_state.keys()):
-        if key != "file_uploader_key":
-            del st.session_state[key]
-    st.session_state["file_uploader_key"] += 1
-    st.session_state["question_input"] = ""
 uploaded_files = st.file_uploader("Upload files", type=["pdf", "docx"], accept_multiple_files=True, key=st.session_state["file_uploader_key"])
 
 if uploaded_files:
@@ -81,8 +82,12 @@ if uploaded_files:
             except Exception as e:
                 st.error(f"Failed to process {uploaded_file.name}: {e}")
     if new_files_uploaded:
-        for chunk in new_chunks:
-            st.session_state.chunk_metadata.append({"chunk": chunk, "source": uploaded_file.name})
+        for i, chunk in enumerate(new_chunks):
+            st.session_state.chunk_metadata.append({
+                "chunk": chunk,
+                "source": uploaded_file.name,
+                "split_id": f"{uploaded_file.name}_{i}"
+            })
         st.session_state.chunks = [item["chunk"] for item in st.session_state.chunk_metadata]
         st.session_state.retriever_manager.build_knowledge_base(st.session_state.chunks)
 
@@ -92,22 +97,21 @@ user_question = st.text_input("Your question:", key="question_input")
 if user_question and st.session_state.chunks:
     with st.spinner("Retrieving answer..."):
         retrieved_chunks = st.session_state.retriever_manager.retrieve_context(user_question, top_k)
-        doc_chunks = {}
+        doc_chunks = []
         for item in st.session_state.chunk_metadata:
             if item["chunk"] in retrieved_chunks:
-                doc_chunks.setdefault(item["source"], []).append(item["chunk"])        
+                doc_chunks.append(item)
         if user_question in st.session_state.qa_cache:
             answer = st.session_state.qa_cache[user_question]
         else:
             context = "\n\n".join(retrieved_chunks)
             prompt = (
-            f"###Instruction:\\n"
             f"You are a helpful assistant. Use only the context below to answer the question clearly and concisely. "
             f"Do not include extra phrases like 'Let me know if I should continue'. "
             f"Respond in a single paragraph without repeating the question.\\n\\n"
-            f"###Context:\\n{context}\\n\\n"
-            f"###Question: {user_question}\\n\\n"
-            f"###Answer:"
+            f"Context:\\n{context}\\n\\n"
+            f"Question: {user_question}\\n\\n"
+            f"Answer:"
         )
             answer = st.session_state.llm_manager.answer(prompt)
             st.session_state.qa_cache[user_question] = answer
@@ -118,7 +122,6 @@ if user_question and st.session_state.chunks:
             st.markdown(answer)
         with col2:
             st.markdown("### 📄 Resources")
-            for doc, chunks in doc_chunks.items():
-                st.markdown(f"**📁 {doc}**")
-                for chunk in chunks:
-                    st.code(chunk.lstrip(".•*- \n"))
+            for chunk_data in doc_chunks:
+                st.markdown(f"[{chunk_data['split_id']}]\n{chunk_data['chunk']}")
+                st.markdown("---")

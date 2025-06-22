@@ -20,7 +20,7 @@ class TogetherLLM:
             "max_tokens": max_tokens,
             "temperature": temperature,
             "top_p": 0.9,
-            "stop": ["\nUser:", "\nQuestion:", "\nAnswer:", "Another question, please."]
+            "stop": ["\nUser:", "\nQuestion:", "\nAnswer:", "Another question, please.", "instructionFollowing"]
         }
 
         response = requests.post(self.api_url, headers=headers, json=payload)
