@@ -50,7 +50,7 @@ if st.session_state.get('authentication_status'):
 
     if st.button("🔄 Reset App"):
         for key in list(st.session_state.keys()):
-            if key != "file_uploader_key":
+            if (key != "file_uploader_key") & (key != "authentication_status"):
                 del st.session_state[key]
         st.session_state["file_uploader_key"] += 1
         st.session_state["question_input"] = ""
