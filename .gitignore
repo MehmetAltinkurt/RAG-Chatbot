@@ -30,6 +30,7 @@ htmlcov/
 coverage.xml
 *.cover
 .hypothesis/
+config.yaml
 
 # Django stuff:
 *.log
