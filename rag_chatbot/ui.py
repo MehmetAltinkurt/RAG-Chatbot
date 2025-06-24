@@ -59,7 +59,7 @@ if st.session_state.get('authentication_status'):
     llm_mode = st.sidebar.radio("LLM Mode", ["Online (Together.ai)", "Offline (Local LLM)"])
     use_local_llm = llm_mode == "Offline (Local LLM)"
     together_model = st.sidebar.text_input("Together.ai Model", "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free")
-    local_model = st.sidebar.text_input("Local LLM Model", "Qwen/Qwen2.5-0.5B-Instruct")
+    local_model = st.sidebar.text_input("Local LLM Model", "Qwen/Qwen2.5-0.5B-Instruct")# "mistralai/Mistral-7B-Instruct-v0.1"
 
     # Initialize retriever once
     if "retriever_manager" not in st.session_state:

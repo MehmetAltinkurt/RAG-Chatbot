@@ -8,7 +8,7 @@ def extract_text_from_pdf(file_path):
     try:
         with pdfplumber.open(file_path) as pdf:
             for page in pdf.pages:
-                page_text = page.extract_text()
+                page_text = page.extract_text(x_tolerance=1)
                 if page_text:
                     text += page_text + "\\n"
     except Exception as e:
