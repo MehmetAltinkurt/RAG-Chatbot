@@ -142,9 +142,9 @@ if st.session_state.get('authentication_status'):
                 prompt = (
                 f"You are a helpful assistant. Use only the context below to answer the question clearly and concisely. "
                 f"Do not include extra phrases like 'Let me know if I should continue'. "
-                f"Respond in a single paragraph without repeating the question.\\n\\n"
-                f"Context:\\n{context}\\n\\n"
-                f"Question: {user_question}\\n\\n"
+                f"Respond in a single paragraph without repeating the question.\n\n"
+                f"Context:\n{context}\n\n"
+                f"Question: {user_question}\n\n"
                 f"Answer:"
             )
                 answer = st.session_state.llm_manager.answer(prompt)
