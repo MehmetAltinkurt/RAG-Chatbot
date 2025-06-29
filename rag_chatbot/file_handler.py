@@ -1,16 +1,13 @@
 import os
-import pdfplumber
+import pymupdf4llm
 import docx
 
 def extract_text_from_pdf(file_path):
     #Extracts text from a PDF file.
     text = ""
     try:
-        with pdfplumber.open(file_path) as pdf:
-            for page in pdf.pages:
-                page_text = page.extract_text(x_tolerance=1)
-                if page_text:
-                    text += page_text + "\n"
+        with open(file_path, 'r') as pdf:
+            text = pymupdf4llm.to_markdown(pdf)
     except Exception as e:
         print(f"Error reading PDF file: {e}")
     return text

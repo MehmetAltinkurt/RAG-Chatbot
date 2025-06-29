@@ -4,9 +4,9 @@ sentence-transformers==2.5.1
 transformers==4.41.2
 torch==2.0.1
 python-docx==0.8.11
-pdfplumber==0.6.2
 python-dotenv>=1.0.0
 langchain>=0.1.14
 accelerate>=0.21.0
 streamlit-authenticator==0.4.2
 numpy==1.26.4
+pymupdf4llm==0.0.25
